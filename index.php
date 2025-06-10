@@ -1,7 +1,7 @@
 <?php
 /**
- * Plugin Name: Pixbet Content Scraper
- * Description: A WordPress plugin to scrape content from Pixbet website.
+ * Plugin Name: Pixbet APK Content Scraper
+ * Description: A WordPress plugin to scrape content from Pixbet APK website.
  * Version: 1.0
  * Author: Michael Tallada
  */
@@ -16,10 +16,10 @@ add_action('admin_menu', 'pixbet_scraper_admin_menu');
 
 function pixbet_scraper_admin_menu() {
     add_options_page(
-        'Pixbet Scraper Settings',
-        'Pixbet Scraper',
+        'Pixbet APK Scraper Settings',
+        'Pixbet APK Scraper',
         'manage_options',
-        'pixbet-scraper',
+        'pixbet-apk-scraper',
         'pixbet_scraper_settings_page'
     );
 }
@@ -27,14 +27,14 @@ function pixbet_scraper_admin_menu() {
 function pixbet_scraper_settings_page() {
     ?>
     <div class="wrap">
-        <h1>Pixbet Content Scraper Settings</h1>
+        <h1>Pixbet APK Content Scraper Settings</h1>
         <h2>Available Shortcodes:</h2>
         <ul>
             <li><strong>[pixbet_home]</strong> - Main page content</li>
+            <li><strong>[pixbet_download]</strong> - Download page</li>
             <li><strong>[pixbet_casino]</strong> - Casino section</li>
             <li><strong>[pixbet_sports]</strong> - Sports betting section</li>
-            <li><strong>[pixbet_promotions]</strong> - Promotions page</li>
-            <li><strong>[pixbet_live]</strong> - Live betting section</li>
+            <li><strong>[pixbet_bonus]</strong> - Bonus/promotions page</li>
         </ul>
         <p>Use these shortcodes in your posts or pages to display the scraped content.</p>
         <p><strong>Note:</strong> All external links will be redirected to: https://seo813.pages.dev?agentid=Bet606</p>
@@ -42,10 +42,10 @@ function pixbet_scraper_settings_page() {
         <h3>Cached Versions (Recommended):</h3>
         <ul>
             <li><strong>[pixbet_home_cached]</strong> - Cached main page (5 min cache)</li>
+            <li><strong>[pixbet_download_cached]</strong> - Cached download page</li>
             <li><strong>[pixbet_casino_cached]</strong> - Cached casino section</li>
             <li><strong>[pixbet_sports_cached]</strong> - Cached sports section</li>
-            <li><strong>[pixbet_promotions_cached]</strong> - Cached promotions</li>
-            <li><strong>[pixbet_live_cached]</strong> - Cached live betting</li>
+            <li><strong>[pixbet_bonus_cached]</strong> - Cached bonus page</li>
         </ul>
         
         <h3>Cache Management:</h3>
@@ -55,21 +55,33 @@ function pixbet_scraper_settings_page() {
         
         <script>
         function clearPixbetCache() {
-            fetch(ajaxurl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: 'action=clear_pixbet_cache&_wpnonce=' + encodeURIComponent('<?php echo wp_create_nonce('clear_pixbet_cache'); ?>')
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Cache cleared successfully!');
-                } else {
-                    alert('Error clearing cache.');
+            if (typeof ajaxurl === 'undefined') {
+                alert('AJAX URL not available');
+                return;
+            }
+            
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', ajaxurl, true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        try {
+                            var response = JSON.parse(xhr.responseText);
+                            if (response.success) {
+                                alert('Cache cleared successfully!');
+                            } else {
+                                alert('Error clearing cache.');
+                            }
+                        } catch (e) {
+                            alert('Cache cleared successfully!');
+                        }
+                    } else {
+                        alert('Error clearing cache.');
+                    }
                 }
-            });
+            };
+            xhr.send('action=clear_pixbet_cache&_wpnonce=<?php echo wp_create_nonce('clear_pixbet_cache'); ?>');
         }
         </script>
     </div>
@@ -78,38 +90,38 @@ function pixbet_scraper_settings_page() {
 
 // Main page scraper shortcode
 function pixbet_home_shortcode() {
-    $url = 'https://www.pixbet.com/';
+    $url = 'https://pixbet-apk.app/';
     return pixbet_scrape_content($url, 'home');
 }
 add_shortcode('pixbet_home', 'pixbet_home_shortcode');
 
+// Download page scraper shortcode
+function pixbet_download_shortcode() {
+    $url = 'https://pixbet-apk.app/download/';
+    return pixbet_scrape_content($url, 'download');
+}
+add_shortcode('pixbet_download', 'pixbet_download_shortcode');
+
 // Casino section scraper shortcode
 function pixbet_casino_shortcode() {
-    $url = 'https://www.pixbet.com/casino';
+    $url = 'https://pixbet-apk.app/casino/';
     return pixbet_scrape_content($url, 'casino');
 }
 add_shortcode('pixbet_casino', 'pixbet_casino_shortcode');
 
 // Sports betting scraper shortcode
 function pixbet_sports_shortcode() {
-    $url = 'https://www.pixbet.com/sports';
+    $url = 'https://pixbet-apk.app/sports/';
     return pixbet_scrape_content($url, 'sports');
 }
 add_shortcode('pixbet_sports', 'pixbet_sports_shortcode');
 
-// Promotions scraper shortcode
-function pixbet_promotions_shortcode() {
-    $url = 'https://www.pixbet.com/promotions';
-    return pixbet_scrape_content($url, 'promotions');
+// Bonus/promotions scraper shortcode
+function pixbet_bonus_shortcode() {
+    $url = 'https://pixbet-apk.app/bonus/';
+    return pixbet_scrape_content($url, 'bonus');
 }
-add_shortcode('pixbet_promotions', 'pixbet_promotions_shortcode');
-
-// Live betting scraper shortcode
-function pixbet_live_shortcode() {
-    $url = 'https://www.pixbet.com/live';
-    return pixbet_scrape_content($url, 'live');
-}
-add_shortcode('pixbet_live', 'pixbet_live_shortcode');
+add_shortcode('pixbet_bonus', 'pixbet_bonus_shortcode');
 
 // Main scraping function
 function pixbet_scrape_content($url, $type = 'home') {
@@ -254,9 +266,9 @@ function pixbet_scrape_content($url, $type = 'home') {
             if (strpos($src, '//') === 0) {
                 $img->setAttribute('src', 'https:' . $src);
             } elseif (strpos($src, '/') === 0) {
-                $img->setAttribute('src', 'https://www.pixbet.com' . $src);
+                $img->setAttribute('src', 'https://pixbet-apk.app' . $src);
             } else {
-                $img->setAttribute('src', 'https://www.pixbet.com/' . ltrim($src, '/'));
+                $img->setAttribute('src', 'https://pixbet-apk.app/' . ltrim($src, '/'));
             }
         }
         
@@ -288,9 +300,9 @@ function pixbet_scrape_content($url, $type = 'home') {
         } else {
             // Relative URL - convert to absolute first, then treat as external
             if (strpos($href, '/') === 0) {
-                $original_url = 'https://www.pixbet.com' . $href;
+                $original_url = 'https://pixbet-apk.app' . $href;
             } else {
-                $original_url = 'https://www.pixbet.com/' . ltrim($href, '/');
+                $original_url = 'https://pixbet-apk.app/' . ltrim($href, '/');
             }
             $is_external = true; // All scraped links are considered external
         }
@@ -453,38 +465,38 @@ function pixbet_get_cached_content($url, $type, $cache_duration = 300) { // 5 mi
 
 // Cached shortcode versions
 function pixbet_home_cached_shortcode() {
-    return pixbet_get_cached_content('https://www.pixbet.com/', 'home');
+    return pixbet_get_cached_content('https://pixbet-apk.app/', 'home');
 }
 add_shortcode('pixbet_home_cached', 'pixbet_home_cached_shortcode');
 
+function pixbet_download_cached_shortcode() {
+    return pixbet_get_cached_content('https://pixbet-apk.app/download/', 'download');
+}
+add_shortcode('pixbet_download_cached', 'pixbet_download_cached_shortcode');
+
 function pixbet_casino_cached_shortcode() {
-    return pixbet_get_cached_content('https://www.pixbet.com/casino', 'casino');
+    return pixbet_get_cached_content('https://pixbet-apk.app/casino/', 'casino');
 }
 add_shortcode('pixbet_casino_cached', 'pixbet_casino_cached_shortcode');
 
 function pixbet_sports_cached_shortcode() {
-    return pixbet_get_cached_content('https://www.pixbet.com/sports', 'sports');
+    return pixbet_get_cached_content('https://pixbet-apk.app/sports/', 'sports');
 }
 add_shortcode('pixbet_sports_cached', 'pixbet_sports_cached_shortcode');
 
-function pixbet_promotions_cached_shortcode() {
-    return pixbet_get_cached_content('https://www.pixbet.com/promotions', 'promotions');
+function pixbet_bonus_cached_shortcode() {
+    return pixbet_get_cached_content('https://pixbet-apk.app/bonus/', 'bonus');
 }
-add_shortcode('pixbet_promotions_cached', 'pixbet_promotions_cached_shortcode');
-
-function pixbet_live_cached_shortcode() {
-    return pixbet_get_cached_content('https://www.pixbet.com/live', 'live');
-}
-add_shortcode('pixbet_live_cached', 'pixbet_live_cached_shortcode');
+add_shortcode('pixbet_bonus_cached', 'pixbet_bonus_cached_shortcode');
 
 // Clear cache function
 function pixbet_clear_cache() {
     $urls = array(
-        'https://www.pixbet.com/' => 'home',
-        'https://www.pixbet.com/casino' => 'casino',
-        'https://www.pixbet.com/sports' => 'sports',
-        'https://www.pixbet.com/promotions' => 'promotions',
-        'https://www.pixbet.com/live' => 'live'
+        'https://pixbet-apk.app/' => 'home',
+        'https://pixbet-apk.app/download/' => 'download',
+        'https://pixbet-apk.app/casino/' => 'casino',
+        'https://pixbet-apk.app/sports/' => 'sports',
+        'https://pixbet-apk.app/bonus/' => 'bonus'
     );
     
     foreach ($urls as $url => $type) {
@@ -492,7 +504,10 @@ function pixbet_clear_cache() {
         delete_transient($cache_key);
     }
     
-    wp_send_json_success('Cache cleared successfully');
+    // Only send JSON if it's an AJAX request
+    if (defined('DOING_AJAX') && DOING_AJAX) {
+        wp_send_json_success('Cache cleared successfully');
+    }
 }
 
 // Add admin action to clear cache
@@ -502,14 +517,36 @@ add_action('wp_ajax_clear_pixbet_cache', 'pixbet_clear_cache');
 register_activation_hook(__FILE__, 'pixbet_scraper_activate');
 function pixbet_scraper_activate() {
     // Clear any existing cache on activation
-    pixbet_clear_cache();
+    $urls = array(
+        'https://pixbet-apk.app/' => 'home',
+        'https://pixbet-apk.app/download/' => 'download',
+        'https://pixbet-apk.app/casino/' => 'casino',
+        'https://pixbet-apk.app/sports/' => 'sports',
+        'https://pixbet-apk.app/bonus/' => 'bonus'
+    );
+    
+    foreach ($urls as $url => $type) {
+        $cache_key = 'pixbet_scraper_' . md5($url . $type);
+        delete_transient($cache_key);
+    }
 }
 
 // Deactivation hook
 register_deactivation_hook(__FILE__, 'pixbet_scraper_deactivate');
 function pixbet_scraper_deactivate() {
     // Clear cache on deactivation
-    pixbet_clear_cache();
+    $urls = array(
+        'https://pixbet-apk.app/' => 'home',
+        'https://pixbet-apk.app/download/' => 'download',
+        'https://pixbet-apk.app/casino/' => 'casino',
+        'https://pixbet-apk.app/sports/' => 'sports',
+        'https://pixbet-apk.app/bonus/' => 'bonus'
+    );
+    
+    foreach ($urls as $url => $type) {
+        $cache_key = 'pixbet_scraper_' . md5($url . $type);
+        delete_transient($cache_key);
+    }
 }
 
 // Add JavaScript to handle click tracking and enhanced functionality
@@ -556,10 +593,10 @@ function pixbet_add_click_tracking() {
 // Add custom admin notice for successful setup
 add_action('admin_notices', 'pixbet_scraper_admin_notice');
 function pixbet_scraper_admin_notice() {
-    if (isset($_GET['page']) && $_GET['page'] === 'pixbet-scraper') {
+    if (isset($_GET['page']) && $_GET['page'] === 'pixbet-apk-scraper') {
         ?>
         <div class="notice notice-success is-dismissible">
-            <p><strong>Pixbet Scraper is active!</strong> Use the shortcodes to display Pixbet content on your site. All external links will redirect to your affiliate URL.</p>
+            <p><strong>Pixbet APK Scraper is active!</strong> Use the shortcodes to display Pixbet APK content on your site. All external links will redirect to your affiliate URL.</p>
         </div>
         <?php
     }
