@@ -1,7 +1,7 @@
 # Pixbet Content Scraper
 ## A WordPress plugin to scrape content from Pixbet website.
  
-Great idea! Let me modify the plugin to scrape from `pixbet-apk.app` instead. This domain is likely more accessible for scraping:Perfect! I've updated the plugin to scrape from `pixbet-apk.app` instead of the main Pixbet domain. Here are the key changes:
+ This domain is likely more accessible for scraping:Perfect! I've updated the plugin to scrape from `pixbet-apk.app` instead of the main Pixbet domain. Here are the key changes:
 
 ## Updated Plugin Features:
 
